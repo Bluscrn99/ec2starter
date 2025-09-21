@@ -28,6 +28,9 @@ app = Flask(__name__)
 def index():
     return "Dummy web server"
 
+@app.route("/ping")
+def ping():
+    return "pong", 200
 # run em
 if __name__ == "__main__":
     # Run watchdog in a separate thread
