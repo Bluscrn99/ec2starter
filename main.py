@@ -30,11 +30,28 @@ def index():
 
 @app.route("/ping")
 def ping():
-    return "pong", 200
+    print("Pong!")
+    return "Pong!", 200
+
+import time
+import requests
+import os
+
+URL_TO_PING = "https://keepalive-blxl.onrender.com"
+
+def ping():
+    while True:
+        try:
+            requests.get(URL_TO_PING, timeout=5)
+            print("Ping!")
+        except Exception as e:
+            print("Bonk. ", e)
+        time.sleep(60)  # ping every minute
 # run em
 if __name__ == "__main__":
     # Run watchdog in a separate thread
     threading.Thread(target=ec2_watchdog, daemon=True).start()
+    threading.Thread(target=ping, daemon=True).start()
     # Run Flask web server on the port Render expects
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
