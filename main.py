@@ -9,14 +9,27 @@ ec2 = boto3.client(
 
 INSTANCE_ID = "i-0268811ed956a0b52"
 
-while True:
-    resp = ec2.describe_instances(InstanceIds=[INSTANCE_ID])
-    state = resp["Reservations"][0]["Instances"][0]["State"]["Name"]
+# the actual code
+def ec2_watchdog():
+    while True:
+        resp = ec2.describe_instances(InstanceIds=[INSTANCE_ID])
+        state = resp["Reservations"][0]["Instances"][0]["State"]["Name"]
+        if state == "stopped":
+            print(f"{INSTANCE_ID} stopped — starting...")
+            ec2.start_instances(InstanceIds=[INSTANCE_ID])
+        time.sleep(10)  # check every 10 seconds
 
-    if state == "stopped":
-        print(f"{INSTANCE_ID} stopped — starting...")
-        ec2.start_instances(InstanceIds=[INSTANCE_ID])
-    else:
-        print(f"{INSTANCE_ID} is {state}")
+# a web server because i need to host this on render as a free web service
+app = Flask(__name__)
 
-    time.sleep(10)
+@app.route("/")
+def index():
+    return "EC2 Watchdog is running!"
+
+# run em
+if __name__ == "__main__":
+    # Run watchdog in a separate thread
+    threading.Thread(target=ec2_watchdog, daemon=True).start()
+    # Run Flask web server on the port Render expects
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
