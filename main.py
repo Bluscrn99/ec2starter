@@ -12,6 +12,7 @@ INSTANCE_ID = "i-0268811ed956a0b52"
 
 # the actual code
 def ec2_watchdog():
+    print("Watchdog started")
     while True:
         resp = ec2.describe_instances(InstanceIds=[INSTANCE_ID])
         state = resp["Reservations"][0]["Instances"][0]["State"]["Name"]
@@ -25,7 +26,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "EC2 Watchdog is running!"
+    return "Dummy web server"
 
 # run em
 if __name__ == "__main__":
