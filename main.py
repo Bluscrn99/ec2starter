@@ -40,6 +40,7 @@ import os
 URL_TO_PING = "https://keepalive-blxl.onrender.com"
 
 def ping():
+    print("Init ping")
     while True:
         try:
             requests.get(URL_TO_PING, timeout=5)
